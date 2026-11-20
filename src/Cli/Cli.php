@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Basileaelterman\Honeybee;
+namespace Basileaelterman\Honeybee\Cli;
 
 use Basileaelterman\Honeybee\Enums\ExitCode;
+use Basileaelterman\Honeybee\Honeybee;
 
 /**
  * Command-line entry point: interprets the arguments given to bin/honeybee.

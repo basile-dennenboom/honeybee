@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Basileaelterman\Honeybee\Tests\Integration;
 
-use Basileaelterman\Honeybee\Cli;
+use Basileaelterman\Honeybee\Cli\Cli;
 use Basileaelterman\Honeybee\Honeybee;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

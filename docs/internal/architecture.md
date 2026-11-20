@@ -24,8 +24,8 @@ Honeybee is a standalone CLI application. It is not a package installed inside t
 | File | What it does |
 |---|---|
 | `bin/honeybee` | Executable entry point. Loads Composer's autoloader (`$_composer_autoload_path` when started through Composer's bin proxy, as with a global or dependency install; otherwise `vendor/autoload.php` next to it) and exits with `Cli::run()`'s return value. |
-| `src/Cli.php` | Interprets the arguments: `--version`/`-V` prints `Honeybee <version>`, `--help`/`-h` prints usage, an unknown option or more than one argument is a usage error. With no arguments it currently reports that the dashboard is not implemented yet; F12 replaces that with starting `Application`. Output goes to injected streams, so it is tested in-process. |
-| `src/ExitCode.php` | Int-backed enum of process exit codes: `Success` (0), `Failure` (1), `Usage` (2). |
+| `src/Cli/Cli.php` | `Cli\Cli`. Interprets the arguments: `--version`/`-V` prints `Honeybee <version>`, `--help`/`-h` prints usage, an unknown option or more than one argument is a usage error. With no arguments it currently reports that the dashboard is not implemented yet; F12 replaces that with starting `Application`. Output goes to injected streams, so it is tested in-process. |
+| `src/Enums/ExitCode.php` | `Enums\ExitCode`. Int-backed enum of process exit codes: `Success` (0), `Failure` (1), `Usage` (2). |
 | `src/Honeybee.php` | Typed constants `NAME` and `VERSION`, the single source of the version number. |
 
 The package is `type: project` with `bin/honeybee` in Composer's `bin`, so it also works with `composer create-project` or `composer global require` once it is published.
@@ -42,6 +42,8 @@ All code lives under `Basileaelterman\Honeybee\` in `src/`.
 | `Storage` | Storage scans, output parsing, `FileCategory` enum, storage value objects |
 | `Health` | HTTP health check, `HealthStatus`, `UptimeTracker` |
 | `Tui` | Terminal control (alternate screen, raw mode, size, signals), layout and rendering |
+| `Cli` | Command-line entry: argument handling for `bin/honeybee` (built) |
+| `Enums` | Shared enums; currently `ExitCode` (built) |
 | (root) | `Application`: wires everything together and owns the main loop |
 
 Value objects (for example `AppInfo`, `DiskDefinition`, `DiskUsage`, `CategoryUsage`, `StorageSnapshot`, `HealthStatus`) are `final readonly` classes. They carry data between collectors and the renderer, so the renderer never touches SSH or framework code.

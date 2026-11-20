@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-use Basileaelterman\Honeybee\Cli;
+use Basileaelterman\Honeybee\Cli\Cli;
 
 $autoloadPath = $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
 
@@ -15,4 +15,5 @@ if (!is_string($autoloadPath) || !is_file($autoloadPath)) {
 
 require $autoloadPath;
 
+/** @var list<string> $argv */
 exit(new Cli()->run(array_slice($argv, 1), STDOUT, STDERR));
