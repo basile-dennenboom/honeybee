@@ -1,0 +1,16 @@
+{
+    "name": "basileaelterman/honeybee",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Basileaelterman\\Honeybee\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Basile Aelterman",
+            "email": "basile@dennenboom.be"
+        }
+    ],
+    "require": {}
+}
