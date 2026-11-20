@@ -5,16 +5,23 @@ declare(strict_types=1);
 namespace Basileaelterman\Honeybee\Tests\Unit;
 
 use Basileaelterman\Honeybee\Cli\Cli;
+use Basileaelterman\Honeybee\Config\ConfigException;
+use Basileaelterman\Honeybee\Config\ConfigLoader;
 use Basileaelterman\Honeybee\Enums\ExitCode;
 use Basileaelterman\Honeybee\Honeybee;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 #[CoversClass(Cli::class)]
+#[UsesClass(ConfigLoader::class)]
+#[UsesClass(ConfigException::class)]
 final class CliTest extends TestCase
 {
+    private const string MISSING_CONFIG_DIRECTORY = __DIR__ . '/no-such-directory';
+
     /**
      * Provide the short and long spelling of the version option.
      *
@@ -77,17 +84,18 @@ final class CliTest extends TestCase
     }
 
     /**
-     * Without arguments the command reports that the dashboard is not available yet.
+     * Without arguments and without a .env file the command reports a configuration error.
      *
      * @return void
      */
-    public function testNoArgumentsFailsWithMessage(): void
+    public function testNoArgumentsWithoutEnvFileReportsConfigError(): void
     {
         [$exitCode, $stdout, $stderr] = $this->runCli([]);
 
         self::assertSame(ExitCode::Failure->value, $exitCode);
         self::assertSame('', $stdout);
-        self::assertStringContainsString('not implemented yet', $stderr);
+        self::assertStringContainsString('configuration error', $stderr);
+        self::assertStringContainsString('No .env file found', $stderr);
     }
 
     /**
@@ -136,7 +144,7 @@ final class CliTest extends TestCase
             throw new RuntimeException('Could not open memory streams.');
         }
 
-        $exitCode = new Cli()->run($arguments, $stdout, $stderr);
+        $exitCode = new Cli(self::MISSING_CONFIG_DIRECTORY)->run($arguments, $stdout, $stderr);
 
         $output = [$exitCode, $this->readStream($stdout), $this->readStream($stderr)];
 

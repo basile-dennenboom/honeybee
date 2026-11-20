@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: mostly design. Only the entry point (roadmap F1) is built; see [Implemented so far](#implemented-so-far). Update this document as the code is written so it describes what exists.
+> Status: mostly design. The entry point (roadmap F1) and configuration (F2) are built; see [Implemented so far](#implemented-so-far). Update this document as the code is written so it describes what exists.
 
 ## Overview
 
@@ -23,8 +23,12 @@ Honeybee is a standalone CLI application. It is not a package installed inside t
 
 | File | What it does |
 |---|---|
-| `bin/honeybee` | Executable entry point. Loads Composer's autoloader (`$_composer_autoload_path` when started through Composer's bin proxy, as with a global or dependency install; otherwise `vendor/autoload.php` next to it) and exits with `Cli::run()`'s return value. |
-| `src/Cli/Cli.php` | `Cli\Cli`. Interprets the arguments: `--version`/`-V` prints `Honeybee <version>`, `--help`/`-h` prints usage, an unknown option or more than one argument is a usage error. With no arguments it currently reports that the dashboard is not implemented yet; F12 replaces that with starting `Application`. Output goes to injected streams, so it is tested in-process. |
+| `bin/honeybee` | Executable entry point. Loads Composer's autoloader (`$_composer_autoload_path` when started through Composer's bin proxy, as with a global or dependency install; otherwise `vendor/autoload.php` next to it) and exits with `Cli::run()`'s return value. Passes the project root (`dirname(__DIR__)`) to `Cli` as the directory that holds `.env`. |
+| `src/Cli/Cli.php` | `Cli\Cli`. Interprets the arguments: `--version`/`-V` prints `Honeybee <version>`, `--help`/`-h` prints usage, an unknown option or more than one argument is a usage error. With no arguments it loads the configuration first: on a `ConfigException` it prints `Honeybee: configuration error in <dir>/.env:` plus one `  - <problem>` line per problem to stderr and exits 1, before anything touches the terminal. With a valid config it currently reports that the dashboard is not implemented yet; F12 replaces that with starting `Application`. Output goes to injected streams, so it is tested in-process. |
+| `src/Config/Config.php` | `Config\Config`. `final readonly` value object with every validated setting: SSH host/user/port/identity file, app path, remote PHP binary, `Framework`, health URL (null = derive from the app URL later), health timeout and refresh interval. No logic. |
+| `src/Config/ConfigLoader.php` | `Config\ConfigLoader`. `load($directory)` reads `<directory>/.env` with `Dotenv::createArrayBacked()`, so only the file is read and the process environment is neither read nor changed. A missing or unparseable file becomes a `ConfigException`. `fromArray()` validates and applies defaults: values are trimmed and an empty value counts as unset (this is what makes `KEY=   # comment` lines from `.env.example` work); `HONEYBEE_SSH_HOST` and `HONEYBEE_APP_PATH` are required, the app path must start with `/`; port, timeout and interval must be positive integers (`filter_var` with `FILTER_VALIDATE_INT`, port at most 65535); the framework is matched case-insensitively against `Framework`; a health URL must be a valid `http`/`https` URL. All problems are collected and thrown together. |
+| `src/Config/ConfigException.php` | `Config\ConfigException` (extends `RuntimeException`). Carries `list<string> $problems`, one sentence per problem; the message is the problems joined by newlines. |
+| `src/Enums/Framework.php` | `Enums\Framework`. String-backed enum of supported `HONEYBEE_FRAMEWORK` values; only `Laravel` (`laravel`). The F5 adapter factory will `match` on it. |
 | `src/Enums/ExitCode.php` | `Enums\ExitCode`. Int-backed enum of process exit codes: `Success` (0), `Failure` (1), `Usage` (2). |
 | `src/Honeybee.php` | Typed constants `NAME` and `VERSION`, the single source of the version number. |
 
@@ -36,14 +40,14 @@ All code lives under `Basileaelterman\Honeybee\` in `src/`.
 
 | Namespace | Responsibility |
 |---|---|
-| `Config` | Load and validate Honeybee's own `.env` into a readonly `Config` object |
+| `Config` | Load and validate Honeybee's own `.env` into a readonly `Config` object (built) |
 | `Ssh` | Run remote commands through the system `ssh` binary; non-blocking process handles |
 | `Framework` | `FrameworkAdapter` interface plus one sub-namespace per framework (`Framework\Laravel`) |
 | `Storage` | Storage scans, output parsing, `FileCategory` enum, storage value objects |
 | `Health` | HTTP health check, `HealthStatus`, `UptimeTracker` |
 | `Tui` | Terminal control (alternate screen, raw mode, size, signals), layout and rendering |
 | `Cli` | Command-line entry: argument handling for `bin/honeybee` (built) |
-| `Enums` | Shared enums; currently `ExitCode` (built) |
+| `Enums` | Shared enums; currently `ExitCode` and `Framework` (built) |
 | (root) | `Application`: wires everything together and owns the main loop |
 
 Value objects (for example `AppInfo`, `DiskDefinition`, `DiskUsage`, `CategoryUsage`, `StorageSnapshot`, `HealthStatus`) are `final readonly` classes. They carry data between collectors and the renderer, so the renderer never touches SSH or framework code.

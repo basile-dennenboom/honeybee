@@ -46,7 +46,7 @@ A local `phpunit.xml`, `phpstan.neon` or `.php-cs-fixer.php` overrides the `.dis
 
 - Test namespace `Basileaelterman\Honeybee\Tests\` → `tests/` (`autoload-dev`).
 - `tests/Unit/`: pure logic, in-process, no processes, network or filesystem outside memory streams.
-- `tests/Integration/`: tests that start real local processes, such as `bin/honeybee` itself (always `proc_open` with an argument array, no shell).
+- `tests/Integration/`: tests that start real local processes, such as `bin/honeybee` itself (always `proc_open` with an argument array, no shell), or that read and write real files. File tests use the `UsesTemporaryDirectory` trait, which gives each test a fresh directory under `sys_get_temp_dir()` and removes it afterwards.
 - Every test class has a `#[CoversClass]` attribute. Test methods get docblocks too.
 - Collectors are tested against recorded command output (fixtures), never against a real server.
 
