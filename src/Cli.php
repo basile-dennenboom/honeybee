@@ -18,7 +18,7 @@ final class Cli
      * @param resource $stdout Stream for normal output.
      * @param resource $stderr Stream for errors.
      *
-     * @return int Exit code for the process (see ExitCode).
+     * @return int Exit code for the process.
      */
     public function run(array $arguments, $stdout, $stderr): int
     {
