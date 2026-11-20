@@ -8,7 +8,7 @@ Honeybee is a PHP terminal UI (TUI) that runs full screen, 24/7, on an office mo
 
 Only Laravel is supported for now. The design must still let other frameworks, such as Symfony, be added later without touching the core. Everything Laravel-specific lives behind the framework adapter.
 
-The project is in its initial state: no code exists yet. The design is in `docs/internal/`, and code must follow it unless the user decides otherwise.
+The project is being built feature by feature from `docs/plans/roadmap.md`; F1 (scaffolding and tooling) is done. The design is in `docs/internal/`, and code must follow it unless the user decides otherwise.
 
 ## Hard rules
 
@@ -31,15 +31,16 @@ The project is in its initial state: no code exists yet. The design is in `docs/
 
 ## Commands
 
-The tooling below is the agreed plan but **is not installed yet**. When you add it, also add composer scripts (`test`, `analyse`, `lint`, `format`) and update this section to match.
-
 ```bash
 composer install
-bin/honeybee                                 # run the TUI (reads .env in the project root)
-vendor/bin/phpunit                           # all tests
-vendor/bin/phpunit --filter StorageParserTest  # single test class or method
-vendor/bin/phpstan analyse                   # static analysis (aim for max level)
-vendor/bin/php-cs-fixer fix                  # PER-CS formatting (with phpdoc stripping disabled)
+bin/honeybee                                   # run the TUI (reads .env in the project root; not implemented yet)
+bin/honeybee --version                         # print "Honeybee <version>" (version: Honeybee::VERSION in src/Honeybee.php)
+composer test                                  # all tests (vendor/bin/phpunit)
+vendor/bin/phpunit --filter CliTest            # single test class or method
+vendor/bin/phpunit --testsuite Unit            # one suite: Unit or Integration
+composer analyse                               # PHPStan, level max (phpstan.neon.dist)
+composer lint                                  # PER-CS 2.0 check, no changes (.php-cs-fixer.dist.php)
+composer format                                # apply PER-CS 2.0 fixes (phpdoc stripping disabled)
 ```
 
 ## Architecture (big picture)

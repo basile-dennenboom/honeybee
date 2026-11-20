@@ -34,6 +34,22 @@ public function parse(string $output): array
 
 ## Tooling
 
-- **PHP-CS-Fixer** with the `@PER-CS` rule set. `no_superfluous_phpdoc_tags` and `phpdoc_to_comment` must be disabled, or the fixer removes the required docblock tags.
-- **PHPStan**, as high a level as is practical (aim for `max`).
-- **PHPUnit** for tests. Collectors are tested against recorded command output (fixtures), never against a real server.
+| Tool | Config file | Composer script | Notes |
+|---|---|---|---|
+| PHPUnit 13 | `phpunit.xml.dist` | `composer test` | Suites `Unit` and `Integration`. Fails on warnings, notices, deprecations (PHP and PHPUnit) and risky tests. Cache in `.phpunit.cache/`. |
+| PHPStan 2 | `phpstan.neon.dist` | `composer analyse` | Level `max` over `bin/honeybee`, `src/` and `tests/`. |
+| PHP-CS-Fixer 3 | `.php-cs-fixer.dist.php` | `composer lint` (check only) / `composer format` (apply) | `@PER-CS2x0` (PER-CS 2.0, pinned so updates never change the style) plus `declare_strict_types`. `no_superfluous_phpdoc_tags` and `phpdoc_to_comment` are disabled, or the fixer would remove the required docblock tags. Covers `src/`, `tests/`, `bin/honeybee` and the config file itself. |
+
+A local `phpunit.xml`, `phpstan.neon` or `.php-cs-fixer.php` overrides the `.dist` file and is gitignored.
+
+## Tests
+
+- Test namespace `Basileaelterman\Honeybee\Tests\` → `tests/` (`autoload-dev`).
+- `tests/Unit/`: pure logic, in-process, no processes, network or filesystem outside memory streams.
+- `tests/Integration/`: tests that start real local processes, such as `bin/honeybee` itself (always `proc_open` with an argument array, no shell).
+- Every test class has a `#[CoversClass]` attribute. Test methods get docblocks too.
+- Collectors are tested against recorded command output (fixtures), never against a real server.
+
+## Versioning
+
+`Honeybee::VERSION` (`src/Honeybee.php`) is the only place the version number lives; `bin/honeybee --version` prints it. Use semantic versioning and bump the constant before tagging a release (`vX.Y.Z`). `tests/Integration/VersionCommandTest.php` checks that the binary prints the constant, that it is valid semver, and, when HEAD is on a git tag, that the tag matches it.

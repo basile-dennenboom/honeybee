@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Basileaelterman\Honeybee\Cli;
+
+// Composer sets $_composer_autoload_path in its bin proxy when Honeybee is installed as a
+// dependency or globally. In a plain checkout, the autoloader is in the project's vendor/.
+$autoloadPath = $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+
+if (!is_string($autoloadPath) || !is_file($autoloadPath)) {
+    fwrite(STDERR, "Honeybee: Composer autoloader not found. Run 'composer install' first.\n");
+
+    // ExitCode cannot be autoloaded yet, so use its Failure value directly.
+    exit(1);
+}
+
+require $autoloadPath;
+
+/** @var list<string> $argv */
+exit(new Cli()->run(array_slice($argv, 1), STDOUT, STDERR));
