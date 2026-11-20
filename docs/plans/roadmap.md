@@ -23,7 +23,7 @@ Decisions made while planning:
 
 ## F2: Configuration
 
-- **Contains:** `Config\ConfigLoader` (reads `.env` via phpdotenv), a readonly `Config\Config` object, and `Config\ConfigurationException`. Validates required keys (`HONEYBEE_SSH_HOST`, `HONEYBEE_APP_PATH`), integer and positive values (port, timeout, interval) and the framework name, and applies defaults.
+- **Contains:** `Config\ConfigLoader` (reads `.env` via phpdotenv), a readonly `Config\Config` object, and `Config\ConfigException`. Validates required keys (`HONEYBEE_SSH_HOST`, `HONEYBEE_APP_PATH`), integer and positive values (port, timeout, interval) and the framework name, and applies defaults.
 - **DoD:** Tests cover defaults, missing required keys, invalid numbers, unknown framework, and the **inline-comment format of the current `.env.example`** (including empty values followed by a comment). With a bad config, `bin/honeybee` prints a clear error and exits non-zero *before* touching the terminal.
 - **Depends on:** F1.
 

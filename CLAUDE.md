@@ -20,7 +20,7 @@ The project is being built feature by feature from `docs/plans/roadmap.md`; F1 (
 ## Code style
 
 - Follow PSR-1, PSR-4 (namespace `Basileaelterman\Honeybee\` → `src/`) and PER Coding Style 2.0 (the successor to PSR-12). Add `declare(strict_types=1);` to every file.
-- **Every function and method gets a full docblock**, even when native types already say the same thing. It needs a one-line description of what the function does or returns, plus every `@param`, `@return` and `@throws` that applies. Because of this, linters must *not* strip "superfluous" phpdoc. Keep `no_superfluous_phpdoc_tags` (and similar rules) disabled in the fixer config.
+- **Every function and method gets a full docblock**, even when native types already say the same thing. It needs a one-line description of what the function does or returns, plus every `@param`, `@return` and `@throws` that applies. Constructors are the exception: a docblock is optional there. When a promoted constructor parameter needs a more precise type than PHP can express (e.g. what an `array` holds), give it an inline `/** @var list<string> */` or a constructor docblock. Because of this, linters must *not* strip "superfluous" phpdoc. Keep `no_superfluous_phpdoc_tags` (and similar rules) disabled in the fixer config.
 - Write simple, clear, straightforward code with no clever tricks. If PHP's standard library or language already has it, use it instead of writing a helper or pulling in a package.
 
 ## Documentation rules

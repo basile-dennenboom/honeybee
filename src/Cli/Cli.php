@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Basileaelterman\Honeybee\Cli;
 
+use Basileaelterman\Honeybee\Config\ConfigException;
+use Basileaelterman\Honeybee\Config\ConfigLoader;
 use Basileaelterman\Honeybee\Enums\ExitCode;
 use Basileaelterman\Honeybee\Honeybee;
 
@@ -12,6 +14,10 @@ use Basileaelterman\Honeybee\Honeybee;
  */
 final class Cli
 {
+    public function __construct(
+        private readonly string $configDirectory,
+    ) {}
+
     /**
      * Run the command for the given arguments and return the process exit code.
      *
@@ -24,9 +30,7 @@ final class Cli
     public function run(array $arguments, $stdout, $stderr): int
     {
         if ($arguments === []) {
-            fwrite($stderr, Honeybee::NAME . ": the dashboard is not implemented yet. Try '--help'.\n");
-
-            return ExitCode::Failure->value;
+            return $this->startDashboard($stderr)->value;
         }
 
         if (count($arguments) > 1) {
@@ -42,6 +46,32 @@ final class Cli
         };
 
         return $exitCode->value;
+    }
+
+    /**
+     * Load the configuration and start the dashboard.
+     *
+     * @param resource $stderr Stream for errors.
+     *
+     * @return ExitCode ExitCode::Failure, both for a bad configuration and because the dashboard is not implemented yet.
+     */
+    private function startDashboard($stderr): ExitCode
+    {
+        try {
+            new ConfigLoader()->load($this->configDirectory);
+        } catch (ConfigException $exception) {
+            fwrite($stderr, Honeybee::NAME . ": configuration error in {$this->configDirectory}/.env:\n");
+
+            foreach ($exception->problems as $problem) {
+                fwrite($stderr, "  - {$problem}\n");
+            }
+
+            return ExitCode::Failure;
+        }
+
+        fwrite($stderr, Honeybee::NAME . ": the dashboard is not implemented yet. Try '--help'.\n");
+
+        return ExitCode::Failure;
     }
 
     /**

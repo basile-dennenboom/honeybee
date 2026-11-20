@@ -15,5 +15,4 @@ if (!is_string($autoloadPath) || !is_file($autoloadPath)) {
 
 require $autoloadPath;
 
-/** @var list<string> $argv */
-exit(new Cli()->run(array_slice($argv, 1), STDOUT, STDERR));
+exit(new Cli(dirname(__DIR__))->run(array_slice($argv ?? [], 1), STDOUT, STDERR));
