@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: design. Nothing here is implemented yet. Update this document as the code is written so it describes what exists.
+> Status: mostly design. Only the entry point (roadmap F1) is built; see [Implemented so far](#implemented-so-far). Update this document as the code is written so it describes what exists.
 
 ## Overview
 
@@ -18,6 +18,17 @@
 ```
 
 Honeybee is a standalone CLI application. It is not a package installed inside the monitored app. It runs on the machine attached to the monitor and reaches the app server over SSH. One instance monitors one application.
+
+## Implemented so far
+
+| File | What it does |
+|---|---|
+| `bin/honeybee` | Executable entry point. Loads Composer's autoloader (`$_composer_autoload_path` when started through Composer's bin proxy, as with a global or dependency install; otherwise `vendor/autoload.php` next to it) and exits with `Cli::run()`'s return value. |
+| `src/Cli.php` | Interprets the arguments: `--version`/`-V` prints `Honeybee <version>`, `--help`/`-h` prints usage, an unknown option or more than one argument is a usage error. With no arguments it currently reports that the dashboard is not implemented yet; F12 replaces that with starting `Application`. Output goes to injected streams, so it is tested in-process. |
+| `src/ExitCode.php` | Int-backed enum of process exit codes: `Success` (0), `Failure` (1), `Usage` (2). |
+| `src/Honeybee.php` | Typed constants `NAME` and `VERSION`, the single source of the version number. |
+
+The package is `type: project` with `bin/honeybee` in Composer's `bin`, so it also works with `composer create-project` or `composer global require` once it is published.
 
 ## Planned namespaces
 
@@ -74,6 +85,12 @@ The loop must never block on remote work. A slow `find` on a big disk must not f
 | `soloterm/screen` | Virtual terminal buffer with differential output, so only changed lines are redrawn (no flicker). Actively maintained. Chosen over `php-tui/php-tui`, whose last release was in 2024. |
 | `vlucas/phpdotenv` | Parsing `.env` correctly (quotes, escaping). `parse_ini_file` does not handle the `.env` format reliably. |
 
-Dev: `phpunit/phpunit`, `phpstan/phpstan`, `friendsofphp/php-cs-fixer`.
+Dev:
 
-Required PHP extensions: `mbstring` (needed by `soloterm/screen`) and `pcntl` (signals and SIGWINCH).
+| Package | Why |
+|---|---|
+| `phpunit/phpunit` | Test runner (`composer test`). |
+| `phpstan/phpstan` | Static analysis at level max (`composer analyse`). |
+| `friendsofphp/php-cs-fixer` | PER-CS 2.0 formatting and checking (`composer format`, `composer lint`). |
+
+Required PHP extensions: `mbstring` (needed by `soloterm/screen`), `pcntl` (signals and SIGWINCH) and `curl` (non-blocking health check with `curl_multi_*`, see the roadmap decision). All three are listed in `composer.json`, so `composer install` refuses to run without them.

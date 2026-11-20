@@ -6,7 +6,7 @@ Honeybee runs on your own machine and reads the application's server over SSH. N
 
 Supported frameworks: **Laravel**. Other frameworks, such as Symfony, are planned.
 
-> **Status:** early development. The design is done; the implementation has not started yet.
+> **Status:** early development. The design is done and the project scaffolding is in place (`bin/honeybee --version` works); the dashboard itself is not implemented yet.
 
 ## Setup
 

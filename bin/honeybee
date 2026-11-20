@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Basileaelterman\Honeybee\Cli;
+
+$autoloadPath = $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+
+if (!is_string($autoloadPath) || !is_file($autoloadPath)) {
+    fwrite(STDERR, "Honeybee: Composer autoloader not found. Run 'composer install' first.\n");
+
+    exit(1);
+}
+
+require $autoloadPath;
+
+exit(new Cli()->run(array_slice($argv, 1), STDOUT, STDERR));

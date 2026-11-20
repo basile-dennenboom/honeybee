@@ -1,16 +1,64 @@
 {
     "name": "basileaelterman/honeybee",
+    "description": "Full-screen terminal dashboard that shows a remote application's storage usage and health over SSH.",
+    "type": "project",
+    "keywords": [
+        "tui",
+        "terminal",
+        "dashboard",
+        "storage",
+        "monitoring",
+        "laravel",
+        "ssh"
+    ],
     "license": "GPL-2.0-or-later",
-    "autoload": {
-        "psr-4": {
-            "Basileaelterman\\Honeybee\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "Basile Aelterman",
             "email": "basile@dennenboom.be"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^8.5",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-pcntl": "*",
+        "soloterm/screen": "^1.1",
+        "vlucas/phpdotenv": "^5.8"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^13.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Basileaelterman\\Honeybee\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Basileaelterman\\Honeybee\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/honeybee"
+    ],
+    "minimum-stability": "stable",
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "lint": "php-cs-fixer fix --dry-run --diff",
+        "format": "php-cs-fixer fix"
+    },
+    "scripts-descriptions": {
+        "test": "Run the PHPUnit test suites.",
+        "analyse": "Run PHPStan static analysis.",
+        "lint": "Check coding style with PHP-CS-Fixer without changing files.",
+        "format": "Fix coding style with PHP-CS-Fixer."
+    }
 }

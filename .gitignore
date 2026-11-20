@@ -1,5 +1,14 @@
 /vendor/
 
+# Tool caches
+/.phpunit.cache/
+/.php-cs-fixer.cache
+
+# Local tool config overrides (the *.dist files are committed)
+/phpunit.xml
+/phpstan.neon
+/.php-cs-fixer.php
+
 # IDE
 /.idea/
 
