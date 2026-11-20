@@ -10,7 +10,7 @@
 
 ## Docblocks
 
-Every function and method has a docblock with:
+Every function and method has a docblock (optional for constructors, see below) with:
 
 - a one-line summary of what it does or returns,
 - `@param` for every parameter,
@@ -18,6 +18,17 @@ Every function and method has a docblock with:
 - `@throws` for every exception it can throw, directly or from code it calls without catching.
 
 Do this even when native type declarations already state the types. Use the docblock to add precision where it helps, e.g. `@param list<DiskDefinition> $disks` or `@return array<string, int>`.
+
+Constructors do not need a docblock. When a promoted parameter needs a more precise type than its native one (PHPStan at level max needs to know what an `array` holds), add either a constructor docblock with `@param`, or an inline `@var` on that parameter:
+
+```php
+public function __construct(
+    /** @var list<string> One sentence per problem. */
+    public readonly array $problems,
+) {}
+```
+
+In `bin/honeybee`, `$argv` is read as `$argv ?? []` instead of being annotated, because PHPStan cannot prove it is defined at the top level of a script.
 
 ```php
 /**

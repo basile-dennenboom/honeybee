@@ -13,6 +13,7 @@ use Throwable;
 final class ConfigException extends RuntimeException
 {
     public function __construct(
+        /** @var list<string> One sentence per problem. */
         public readonly array $problems,
         ?Throwable $previous = null,
     ) {
